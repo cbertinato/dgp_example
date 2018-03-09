@@ -61,5 +61,5 @@ gravity['gravity'] += offset
 
 print('Processing')
 g = AirbornePost(trajectory, gravity, begin_static=first_static,
-                 end_static=second_static, tie=tie_gravity, k=k_factor)
+                 end_static=second_static)
 results = g.execute()
