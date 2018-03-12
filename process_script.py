@@ -1,4 +1,6 @@
 from datetime import datetime
+import numpy as np
+import pandas as pd
 
 from dgp.lib.gravity_ingestor import read_at1a
 from dgp.lib.trajectory_ingestor import import_trajectory
@@ -63,3 +65,15 @@ print('Processing')
 g = AirbornePost(trajectory, gravity, begin_static=first_static,
                  end_static=second_static)
 results = g.execute()
+trajectory = results['shifted_trajectory']
+time = pd.Series(trajectory.index.astype(np.int64) / 10**9, index=trajectory.index, name='unix_time')
+output_frame = pd.concat([time, trajectory[['lat', 'long', 'ell_ht']],
+                          results['eotvos'], results['lat_corr'],
+                          results['fac'], results['total_corr'],
+                          results['abs_grav'], results['corrected_grav']],
+                         axis=1)
+output_frame.columns = ['unix_time', 'lat', 'lon', 'ell_ht', 'eotvos',
+                        'lat_corr', 'fac', 'total_corr', 'vert_accel',
+                        'gravity']
+
+output_frame.to_csv('/Users/chrisbert/Documents/Git/dgp_example/data/L650.csv', index=False)
